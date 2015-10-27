@@ -2,22 +2,24 @@
 
 global $wpdb;
 //require_once('..\..\..\wp-config.php');
-require_once($_SERVER['DOCUMENT_ROOT']."/".get_option('foodor_site_dir')."/wp-config.php");
+//require_once($_SERVER['DOCUMENT_ROOT']."/".get_option('foodor_site_dir')."/wp-config.php");
 //require_once('C:\xampp\htdocs\olala\wp-config.php');
+require_once(ABSPATH."wp-config.php");
 
 echo dirname(__FILE__);
 
 if($_POST['foodor_hidden'] == 'Y'){
 
-    $table_name = "item";
+    $table_name = get_option('foodor_dbtable_prefix').get_option('foodor_dbtable_name');
     $title = $_POST['foodor_item_title'];
     $description = $_POST['foodor_item_description'];
     $price = $_POST['foodor_item_price'];
     $itemurl = $_POST['foodor_item_itemurl'];
-    $itemmenu = $_POST['foodor_item_menu'];
-    $todaymenu = $_POST['foodor_item_today_menu'];
 
-    //$table_name = $wpdb->prefix . "imlisteningto";
+    if(isset($_POST['foodor_item_menu'])){ $itemmenu = 1; }else{ $itemmenu = 0; }
+    if(isset($_POST['foodor_item_today_menu'])){ $todaymenu = 1; }else{ $todaymenu = 0; }
+    //$itemmenu = $_POST['foodor_item_menu'];
+    //$todaymenu = $_POST['foodor_item_today_menu'];
 
     $wpdb->insert( $table_name, array( 'title' => $title, 'description' => $description, 'price' => $price, 'image_url' => $itemurl, 'menu' => $itemmenu, 'today_menu' => $todaymenu ) );
 
@@ -33,7 +35,7 @@ if($_POST['foodor_hidden'] == 'Y'){
     <?php    echo "<h4>" . __( 'FoodOrders Add Items') . "</h4>"; ?>
     <p><?php _e("Naziv artikla: " ); ?><input type="text" name="foodor_item_title" value="" size="20"><?php _e(" ex: Pizza" ); ?></p>
     <p><?php _e("Opis artikla: " ); ?><input type="text" name="foodor_item_description" value="" size="20"><?php _e(" ex: Velika, mala..." ); ?></p>
-    <p><?php _e("Cena artikla: " ); ?><input type="text" name="foodor_item_price" value="" size="20"><?php _e(" ex: 100" ); ?></p>
+    <p><?php _e("Cena artikla: " ); ?><input type="text" name="foodor_item_price" value="" size="20"><?php _e(" ex: 100.99" ); ?></p>
     <p><?php _e("Photo link: " ); ?><input type="text" name="foodor_item_itemurl" value="" size="20"><?php _e(" ex: http://www.olala.co.rs/..." ); ?></p>
     <p><?php _e("Menu lista: " ); ?><input type="checkbox" name="foodor_item_menu" value="" size="20"><?php _e(" ex: Da li se prikazuje na spisku?" ); ?></p>
     <p><?php _e("Danasnji menu: " ); ?><input type="checkbox" name="foodor_item_today_menu" value="" size="20"><?php _e(" ex: Da li je na danasnjem meniu?" ); ?></p>

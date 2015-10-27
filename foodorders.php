@@ -59,13 +59,25 @@ add_action('admin_menu', 'foodor_admin_additems');
 
 function foodor_getproducts($product_cnt=1) {
 
+    //require_once($_SERVER['DOCUMENT_ROOT']."/".get_option('foodor_site_dir')."/wp-config.php");
+    require_once(ABSPATH."wp-config.php");
+
+    /*$test = ABSPATH."wp-config.php";
+    var_dump($test);*/
+
     //Connect to the olalaco_websajt database
-    $connection = new wpdb(get_option('foodor_db_username'),get_option('foodor_db_password'), get_option('foodor_db_database'), get_option('foodor_db_server'));
+    //$connection = new wpdb(get_option('foodor_db_username'),get_option('foodor_db_password'), get_option('foodor_db_database'), get_option('foodor_db_server'));
+    $connection = new wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
+
+    //var_dump($connection);
+
+    $table_name = get_option('foodor_dbtable_prefix').get_option('foodor_dbtable_name');
 
 
     if(isset($_GET['id'])) {
         $id = $_GET['id'];
-        $sqlget = "SELECT * FROM item WHERE id = ".$id;
+
+        $sqlget = "SELECT * FROM {$table_name} WHERE id = ".$id;
 
         if (!$results = $connection->get_results($sqlget)){
             die('Ne mogu da izvrsim upit zbog ['. $connection->error
@@ -190,14 +202,12 @@ return $tablepost;
         $product_count = 0;
         while ($product_count == 0) {
             $product_id = rand(0,30);
-            $product_count = $connection->get_var("SELECT COUNT(*) FROM item WHERE id=$product_id AND today_menu=1");
+            $product_count = $connection->get_var("SELECT COUNT(*) FROM {$table_name} WHERE id=$product_id AND today_menu=1");
         }
 
         //Get product image, name and URL
-        $product_image = $connection->get_var("SELECT image_url FROM item WHERE id=$product_id");
-        $product_name = $connection->get_var("SELECT title FROM item WHERE id=$product_id");
-        //$store_url = get_option('oscimp_store_url');
-        //$image_folder = get_option('oscimp_prod_img_folder');
+        $product_image = $connection->get_var("SELECT image_url FROM {$table_name} WHERE id=$product_id");
+        $product_name = $connection->get_var("SELECT title FROM {$table_name} WHERE id=$product_id");
 
         //Build the HTML code
         $retval .= '<div class="foodor_product">';
@@ -209,7 +219,9 @@ return $tablepost;
     //return $retval;
     /*********** End of Example from tutorial **********/
 
-    $sql = "SELECT * FROM item WHERE menu = 1 ORDER BY id ASC ";
+    $sql = "SELECT * FROM {$table_name} WHERE menu = 1 ORDER BY id ASC ";
+
+    //print_r($sql);
 
     if (!$results = $connection->get_results($sql)){
         die('Ne mogu da izvrsim upit zbog ['. $connection->error

@@ -5,38 +5,48 @@
         $site_dir = $_POST['foodor_site_dir'];
         update_option('foodor_site_dir', $site_dir);
 
+        $slash = '';
+        if($_POST['foodor_dbtable_prefix'] <> ''){ $slash = '_'; }
+        $dbtable_prefix = $_POST['foodor_dbtable_prefix'].$slash;
+        update_option('foodor_dbtable_prefix', $dbtable_prefix);
+
+        $dbtable_name = $_POST['foodor_dbtable_name'];
+        update_option('foodor_dbtable_name', $dbtable_name);
 
 
-        $db_server = $_POST['foodor_db_server'];
-        update_option('foodor_db_server', $db_server);
+        $table_name = $dbtable_prefix.$dbtable_name;
+        /*
+        -- Table structure for table item
+        */
+        
+        $sqlcreate = "CREATE TABLE IF NOT EXISTS $table_name (
+                id int(11) NOT NULL AUTO_INCREMENT,
+          title varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+          description varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+          image_url varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+          price decimal(10,2) NOT NULL,
+          today_menu tinyint(1) NOT NULL,
+          menu tinyint(1) NOT NULL,
+          staff_id int(11) DEFAULT NULL,
+          PRIMARY KEY (id)
+        ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
-        $db_database = $_POST['foodor_db_database'];
-        update_option('foodor_db_database', $db_database);
+        //var_dump($sqlcreate);
+        //print_r($sqlcreate);
 
-        $db_username = $_POST['foodor_db_username'];
-        update_option('foodor_db_username', $db_username);
+        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        dbDelta($sqlcreate);
 
-        $db_password = $_POST['foodor_db_password'];
-        update_option('foodor_db_password', $db_password);
-
-        //$prod_img_folder = $_POST['foodor_prod_img_folder'];
-        //update_option('foodor_prod_img_folder', $prod_img_folder);
-
-        //$store_url = $_POST['foodor_store_url'];
-        //update_option('foodor_store_url', $store_url);
         ?>
         <div class="updated"><p><strong><?php _e('Options saved.' ); ?></strong></p></div>
         <?php
     } else {
         //Normal page display
         $site_dir = get_option('foodor_site_dir');
+        $dbtable_prefix = get_option('foodor_dbtable_prefix');
+        $dbtable_name = get_option('foodor_dbtable_name');
 
-        $db_server = get_option('foodor_db_server');
-        $db_database = get_option('foodor_db_database');
-        $db_username = get_option('foodor_db_username');
-        $db_password = get_option('foodor_db_password');
-        //$prod_img_folder = get_option('foodor_prod_img_folder');
-        //$store_url = get_option('foodor_store_url');
+
     }
 
 ?>
@@ -49,12 +59,10 @@
     <input type="hidden" name="foodor_hidden" value="Y">
     <?php    echo "<h4>" . __( 'FoodOrders Database Settings', 'foodor_trdom' ) . "</h4>"; ?>
     <p><?php _e("Root Site DIR: " ); ?><input type="text" name="foodor_site_dir" value="<?php echo $site_dir; ?>" size="20"><?php _e(" ex: SiteDIR, SiteName or something..." ); ?></p>
+    <p><?php _e("DB Table Prefix: " ); ?><input type="text" name="foodor_dbtable_prefix" value="foodor" size="20"><?php _e(" ex: foodor or something..." ); ?></p>
+    <p><?php _e("DB Table Name: " ); ?><input type="text" name="foodor_dbtable_name" value="item" size="20"><?php _e(" ex: item or something..." ); ?></p>
 
-    <p><?php _e("Database host: " ); ?><input type="text" name="foodor_db_server" value="<?php echo $db_server; ?>" size="20"><?php _e(" ex: localhost" ); ?></p>
-    <p><?php _e("Database name: " ); ?><input type="text" name="foodor_db_database" value="<?php echo $db_database; ?>" size="20"><?php _e(" ex: foodorders_shop" ); ?></p>
-    <p><?php _e("Database user: " ); ?><input type="text" name="foodor_db_username" value="<?php echo $db_username; ?>" size="20"><?php _e(" ex: root" ); ?></p>
-    <p><?php _e("Database password: " ); ?><input type="text" name="foodor_db_password" value="<?php echo $db_password; ?>" size="20"><?php _e(" ex: secretpassword" ); ?></p>
-    <hr />
+    <br />
     <hr />
     <!--?php    echo "<h4>" . __( 'FoodOrders Store Settings', 'foodor_trdom' ) . "</h4>"; ?>
     <p><!--?php _e("Store URL: " ); ?><input type="text" name="foodor_store_url" value="<!--?php echo $store_url; ?>" size="20"><!--?php _e(" ex: http://www.yourstore.com/" ); ?></p>
